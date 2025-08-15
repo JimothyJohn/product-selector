@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  product-selector
+
+  Sample SAM Template for product-selector
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 1024
+    EphemeralStorage:
+      Size: 1024
+
+    Tracing: Active
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+  Api:
+    TracingEnabled: true
+
+Resources:
+  ProductSelectorFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./app
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Architectures:
+      - x86_64
+      # AI-generated comment: Add FunctionUrlConfig to enable streaming responses.
+      # AuthType is set to AWS_IAM for secure access, and InvokeMode is set to
+      # RESPONSE_STREAM to allow the function to stream data.
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+        InvokeMode: RESPONSE_STREAM
+      # Enable access to API keys
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        ProductSelectorGet:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /hello
+            Method: GET
+            RestApiId: !Ref ApiGateway
+        ProductSelectorPost:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: POST
+            RestApiId: !Ref ApiGateway
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      Auth:
+        DefaultAuthorizer: NONE
+      Cors:
+        AllowHeaders: "'Content-Type,Authorization,x-api-key'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowOrigin: "'*'"
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ProductSelectorApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+  ProductSelectorFunction:
+    Description: Hello World Lambda Function ARN
+    Value: !GetAtt ProductSelectorFunction.Arn
+  ProductSelectorFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value: !GetAtt ProductSelectorFunctionRole.Arn

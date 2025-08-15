@@ -1,0 +1,19 @@
+[project]
+name = "product-selector"
+version = "0.1.0"
+description = "Product selector"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.40.8",
+    "requests>=2.32.4",
+    "httpx>=0.27.0",
+    "click>=8.1.7",
+]
+
+[dependency-groups]
+dev = [
+    "python-dotenv>=1.1.1",
+    "pytest>=8.4.1",
+    "ruff>=0.12.7"
+]

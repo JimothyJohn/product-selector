@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+set -e
+
+if [[ "${TRACE-0}" == "1" ]]; then
+    set -o xtrace
+fi
+
+# Function to display help
+help_function() {
+    cat <<EOF
+
+Usage: $(basename "$0") [-h] [--lib-dir LIB_DIR]
+
+Options:
+  -h, --help       Display this help message and exit
+EOF
+}
+
+# Function to check if a command exists
+command_exists() {
+    if command -v "$1" >/dev/null 2>&1; then
+        return 0
+    else
+        echo "'$1' not found."
+        return 1
+    fi
+}
+
+# Check required dependencies
+check_dependencies() {
+    if ! command_exists uv; then
+        cat <<EOF
+
+uv is not installed. Install it using:
+
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+EOF
+        exit 1
+    fi
+
+    if ! command_exists sam; then
+        cat <<EOF
+
+AWS SAM CLI is not installed or not in your PATH. Install it with:
+
+Linux:
+
+wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip && \\
+    unzip aws-sam-cli-linux-x86_64.zip -d sam-installation && \\
+    sudo ./sam-installation/install && \\
+    rm -rf aws-sam-cli-linux-x86_64.zip sam-installation
+
+macOS:
+
+brew tap aws/tap && \\
+    brew install aws-sam-cli
+
+EOF
+        exit 1
+    fi
+}
+
+# Main function of the script
+main() {
+    local FUNCTION="product-selector"
+
+    # Parse arguments
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+            -h|--help)
+                help_function
+                exit 0
+                ;;
+            -f|--function)
+                FUNCTION="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown parameter passed: $1"
+                help_function
+                exit 1
+                ;;
+        esac
+    done
+
+    check_dependencies
+
+    # Deploy updates to AWS
+    echo "Updating endpoint..."
+    cd lambda && \
+        uv run ruff format app && \
+        PYTHONPATH="app" uv run pytest tests/unit && \
+        sam validate --lint && \
+        sam build && \
+        sam deploy && \
+        PYTHONPATH="app" uv run pytest tests/integration && \ 
+        cd -
+}
+
+main "$@"
