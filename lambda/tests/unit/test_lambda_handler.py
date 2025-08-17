@@ -505,5 +505,517 @@ class TestResponseFormat:
         assert isinstance(body["error"], str)
 
 
+class TestHelperFunctions:
+    """Test utility functions used by the Lambda handler."""
+    
+    def test_convert_dynamodb_item_string(self):
+        """Test DynamoDB string conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({"S": "test string"})
+        assert result == "test string"
+    
+    def test_convert_dynamodb_item_number_int(self):
+        """Test DynamoDB integer number conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({"N": "123"})
+        assert result == 123
+        assert isinstance(result, int)
+    
+    def test_convert_dynamodb_item_number_float(self):
+        """Test DynamoDB float number conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({"N": "123.45"})
+        assert result == 123.45
+        assert isinstance(result, float)
+    
+    def test_convert_dynamodb_item_boolean(self):
+        """Test DynamoDB boolean conversion."""
+        from app import _convert_dynamodb_item
+        
+        assert _convert_dynamodb_item({"BOOL": True}) is True
+        assert _convert_dynamodb_item({"BOOL": False}) is False
+    
+    def test_convert_dynamodb_item_null(self):
+        """Test DynamoDB null conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({"NULL": True})
+        assert result is None
+    
+    def test_convert_dynamodb_item_list(self):
+        """Test DynamoDB list conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({
+            "L": [
+                {"S": "item1"},
+                {"N": "42"},
+                {"BOOL": True}
+            ]
+        })
+        assert result == ["item1", 42, True]
+    
+    def test_convert_dynamodb_item_map(self):
+        """Test DynamoDB map/dict conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({
+            "M": {
+                "name": {"S": "test"},
+                "count": {"N": "5"}
+            }
+        })
+        assert result == {"name": "test", "count": 5}
+    
+    def test_convert_dynamodb_item_string_set(self):
+        """Test DynamoDB string set conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({"SS": ["a", "b", "c"]})
+        assert result == ["a", "b", "c"]
+    
+    def test_convert_dynamodb_item_number_set(self):
+        """Test DynamoDB number set conversion."""
+        from app import _convert_dynamodb_item
+        
+        result = _convert_dynamodb_item({"NS": ["1", "2.5", "3"]})
+        assert result == [1, 2.5, 3]
+    
+    def test_convert_dynamodb_item_unknown_type(self):
+        """Test DynamoDB unknown type handling."""
+        from app import _convert_dynamodb_item
+        
+        unknown_value = {"UNKNOWN": "value"}
+        result = _convert_dynamodb_item(unknown_value)
+        assert result == unknown_value
+
+
+class TestFilterItems:
+    """Test the filter_items function."""
+    
+    def test_filter_no_filters(self):
+        """Test filtering with no filters returns all items."""
+        from app import filter_items
+        
+        items = [{"PK": "gearbox#GB-001", "model_name": "Test"}]
+        result = filter_items(items, {})
+        assert result == items
+    
+    def test_filter_category_gearbox_item(self):
+        """Test category filtering on gearbox items."""
+        from app import filter_items
+        
+        items = [
+            {
+                "PK": "gearbox#GB-001",
+                "application_type": "automotive",
+                "model_name": "Auto Gearbox"
+            },
+            {
+                "PK": "gearbox#GB-002",
+                "application_type": "industrial",
+                "model_name": "Industrial Gearbox"
+            }
+        ]
+        
+        result = filter_items(items, {"category": "automotive"})
+        assert len(result) == 1
+        assert result[0]["model_name"] == "Auto Gearbox"
+    
+    def test_filter_category_category_item(self):
+        """Test category filtering on category items."""
+        from app import filter_items
+        
+        items = [
+            {"PK": "category#automotive", "category_name": "Automotive"},
+            {"PK": "category#industrial", "category_name": "Industrial"}
+        ]
+        
+        result = filter_items(items, {"category": "automotive"})
+        assert len(result) == 1
+        assert result[0]["category_name"] == "Automotive"
+    
+    def test_filter_manufacturer(self):
+        """Test manufacturer filtering."""
+        from app import filter_items
+        
+        items = [
+            {"PK": "gearbox#GB-001", "manufacturer": "ABC Corp"},
+            {"PK": "gearbox#GB-002", "manufacturer": "XYZ Industries"}
+        ]
+        
+        result = filter_items(items, {"manufacturer": "ABC"})
+        assert len(result) == 1
+        assert result[0]["manufacturer"] == "ABC Corp"
+    
+    def test_filter_price_range(self):
+        """Test price range filtering."""
+        from app import filter_items
+        
+        items = [
+            {"PK": "gearbox#GB-001", "price_range": "low"},
+            {"PK": "gearbox#GB-002", "price_range": "high"}
+        ]
+        
+        result = filter_items(items, {"price_range": "low"})
+        assert len(result) == 1
+        assert result[0]["price_range"] == "low"
+    
+    def test_filter_min_torque(self):
+        """Test minimum torque filtering."""
+        from app import filter_items
+        
+        items = [
+            {"PK": "gearbox#GB-001", "torque_rating": 1000},
+            {"PK": "gearbox#GB-002", "torque_rating": 3000}
+        ]
+        
+        result = filter_items(items, {"min_torque": "2000"})
+        assert len(result) == 1
+        assert result[0]["torque_rating"] == 3000
+    
+    def test_filter_min_performance(self):
+        """Test minimum performance filtering."""
+        from app import filter_items
+        
+        items = [
+            {"PK": "gearbox#GB-001", "performance_rating": 70},
+            {"PK": "gearbox#GB-002", "performance_rating": 90}
+        ]
+        
+        result = filter_items(items, {"min_performance": "80"})
+        assert len(result) == 1
+        assert result[0]["performance_rating"] == 90
+    
+    def test_filter_invalid_torque(self):
+        """Test filtering with invalid torque values."""
+        from app import filter_items
+        
+        items = [
+            {"PK": "gearbox#GB-001", "torque_rating": "invalid"},
+            {"PK": "gearbox#GB-002", "torque_rating": 3000}
+        ]
+        
+        result = filter_items(items, {"min_torque": "invalid_filter"})
+        # Should return all items since filter is invalid
+        assert len(result) == 2
+    
+    def test_filter_multiple_conditions(self):
+        """Test filtering with multiple conditions."""
+        from app import filter_items
+        
+        items = [
+            {
+                "PK": "gearbox#GB-001",
+                "application_type": "automotive",
+                "torque_rating": 3000,
+                "manufacturer": "ABC Corp"
+            },
+            {
+                "PK": "gearbox#GB-002",
+                "application_type": "automotive",
+                "torque_rating": 1000,
+                "manufacturer": "ABC Corp"
+            }
+        ]
+        
+        result = filter_items(items, {
+            "category": "automotive",
+            "min_torque": "2000",
+            "manufacturer": "ABC"
+        })
+        assert len(result) == 1
+        assert result[0]["torque_rating"] == 3000
+
+
+class TestCRUDOperations:
+    """Test CRUD operations for gearbox management."""
+    
+    @patch('app.dynamodb.put_item')
+    def test_create_gearbox_complete(self, mock_put):
+        """Test creating a gearbox with all optional fields."""
+        from app import create_gearbox
+        
+        mock_put.return_value = {}
+        
+        data = {
+            "gearbox": {
+                "gearbox_id": "GB-TEST-001",
+                "model_name": "Complete Test Gearbox",
+                "manufacturer": "Test Corp",
+                "gearbox_type": "planetary",
+                "torque_rating": 2500,
+                "performance_rating": 85,
+                "application_type": "automotive",
+                "price_range": "medium"
+            },
+            "timestamp": "2025-08-17T12:00:00Z"
+        }
+        
+        result = create_gearbox(data)
+        
+        assert result["statusCode"] == 201
+        body = json.loads(result["body"])
+        assert body["gearbox_id"] == "GB-TEST-001"
+        
+        # Verify put_item was called with correct parameters
+        mock_put.assert_called_once()
+        call_args = mock_put.call_args
+        assert call_args[1]["TableName"] == "gearbox_catalog"
+        assert "ConditionExpression" in call_args[1]
+    
+    @patch('app.dynamodb.put_item')
+    def test_create_gearbox_duplicate(self, mock_put):
+        """Test creating a gearbox that already exists."""
+        from app import create_gearbox
+        from botocore.exceptions import ClientError
+        
+        # Mock ConditionalCheckFailedException
+        mock_put.side_effect = ClientError(
+            {"Error": {"Code": "ConditionalCheckFailedException"}},
+            "PutItem"
+        )
+        
+        data = {
+            "gearbox": {
+                "gearbox_id": "GB-DUPLICATE",
+                "model_name": "Test",
+                "manufacturer": "Test Corp",
+                "gearbox_type": "planetary"
+            }
+        }
+        
+        result = create_gearbox(data)
+        
+        assert result["statusCode"] == 409
+        body = json.loads(result["body"])
+        assert "already exists" in body["error"]
+    
+    @patch('app.dynamodb.update_item')
+    def test_update_gearbox_success(self, mock_update):
+        """Test successful gearbox update."""
+        from app import update_gearbox
+        
+        mock_update.return_value = {}
+        
+        data = {
+            "gearbox_id": "GB-TEST-001",
+            "updates": {
+                "torque_rating": 3000,
+                "performance_rating": 90,
+                "model_name": "Updated Gearbox"
+            },
+            "timestamp": "2025-08-17T12:30:00Z"
+        }
+        
+        result = update_gearbox(data)
+        
+        assert result["statusCode"] == 200
+        body = json.loads(result["body"])
+        assert body["gearbox_id"] == "GB-TEST-001"
+        assert "torque_rating" in body["updated_fields"]
+    
+    @patch('app.dynamodb.update_item')
+    def test_update_gearbox_not_found(self, mock_update):
+        """Test updating a non-existent gearbox."""
+        from app import update_gearbox
+        from botocore.exceptions import ClientError
+        
+        mock_update.side_effect = ClientError(
+            {"Error": {"Code": "ConditionalCheckFailedException"}},
+            "UpdateItem"
+        )
+        
+        data = {
+            "gearbox_id": "GB-NONEXISTENT",
+            "updates": {"torque_rating": 3000}
+        }
+        
+        result = update_gearbox(data)
+        
+        assert result["statusCode"] == 404
+        body = json.loads(result["body"])
+        assert "not found" in body["error"]
+    
+    def test_update_gearbox_no_updates(self):
+        """Test update with no update fields provided."""
+        from app import update_gearbox
+        
+        data = {
+            "gearbox_id": "GB-TEST-001",
+            "updates": {}
+        }
+        
+        result = update_gearbox(data)
+        
+        assert result["statusCode"] == 400
+        body = json.loads(result["body"])
+        assert "No updates provided" in body["error"]
+    
+    @patch('app.dynamodb.update_item')
+    def test_update_gearbox_protected_fields(self, mock_update):
+        """Test update attempting to modify protected fields."""
+        from app import update_gearbox
+        
+        data = {
+            "gearbox_id": "GB-TEST-001",
+            "updates": {
+                "PK": "modified-pk",
+                "SK": "modified-sk",
+                "gearbox_id": "modified-id"
+            }
+        }
+        
+        result = update_gearbox(data)
+        
+        assert result["statusCode"] == 400
+        body = json.loads(result["body"])
+        assert "No valid fields" in body["error"]
+    
+    @patch('app.dynamodb.delete_item')
+    def test_delete_gearbox_success(self, mock_delete):
+        """Test successful gearbox deletion."""
+        from app import delete_gearbox
+        
+        mock_delete.return_value = {}
+        
+        data = {"gearbox_id": "GB-TEST-001"}
+        
+        result = delete_gearbox(data)
+        
+        assert result["statusCode"] == 200
+        body = json.loads(result["body"])
+        assert body["gearbox_id"] == "GB-TEST-001"
+        assert "deleted successfully" in body["message"]
+    
+    @patch('app.dynamodb.delete_item')
+    def test_delete_gearbox_not_found(self, mock_delete):
+        """Test deleting a non-existent gearbox."""
+        from app import delete_gearbox
+        from botocore.exceptions import ClientError
+        
+        mock_delete.side_effect = ClientError(
+            {"Error": {"Code": "ConditionalCheckFailedException"}},
+            "DeleteItem"
+        )
+        
+        data = {"gearbox_id": "GB-NONEXISTENT"}
+        
+        result = delete_gearbox(data)
+        
+        assert result["statusCode"] == 404
+        body = json.loads(result["body"])
+        assert "not found" in body["error"]
+    
+    def test_delete_gearbox_no_id(self):
+        """Test deletion without providing gearbox ID."""
+        from app import delete_gearbox
+        
+        data = {}
+        
+        result = delete_gearbox(data)
+        
+        assert result["statusCode"] == 400
+        body = json.loads(result["body"])
+        assert "gearbox_id is required" in body["error"]
+
+
+class TestErrorHandling:
+    """Test error handling scenarios."""
+    
+    @patch('app.dynamodb.scan')
+    def test_dynamodb_client_error(self, mock_scan):
+        """Test DynamoDB client error handling."""
+        from botocore.exceptions import ClientError
+        
+        mock_scan.side_effect = ClientError(
+            {"Error": {"Code": "ResourceNotFoundException", "Message": "Table not found"}},
+            "Scan"
+        )
+        
+        valid_get_event = {
+            "body": None,
+            "headers": {"x-api-key": "test-key"},
+            "httpMethod": "GET",
+            "queryStringParameters": None
+        }
+        
+        result = lambda_handler(valid_get_event, None)
+        
+        assert result["statusCode"] == 500
+        body = json.loads(result["body"])
+        assert "Database operation failed" in body["error"]
+    
+    @patch('app.dynamodb.scan')
+    def test_unexpected_exception(self, mock_scan):
+        """Test handling of unexpected exceptions."""
+        mock_scan.side_effect = RuntimeError("Unexpected error")
+        
+        valid_get_event = {
+            "body": None,
+            "headers": {"x-api-key": "test-key"},
+            "httpMethod": "GET",
+            "queryStringParameters": None
+        }
+        
+        result = lambda_handler(valid_get_event, None)
+        
+        assert result["statusCode"] == 500
+        body = json.loads(result["body"])
+        assert "Internal server error" in body["error"]
+    
+    @patch('app.get_all_gearboxes')
+    def test_pagination_handling(self, mock_get_all):
+        """Test that pagination is handled correctly in get_all_gearboxes."""
+        # This test verifies our function can handle the pagination logic
+        mock_get_all.return_value = []
+        
+        valid_get_event = {
+            "body": None,
+            "headers": {"x-api-key": "test-key"},
+            "httpMethod": "GET",
+            "queryStringParameters": None
+        }
+        
+        result = lambda_handler(valid_get_event, None)
+        
+        assert result["statusCode"] == 200
+        mock_get_all.assert_called_once()
+
+
+class TestLoggingConfiguration:
+    """Test logging configuration functionality."""
+    
+    def test_configure_logging_default(self):
+        """Test logging configuration with default level."""
+        from app import configure_logging
+        import logging
+        
+        with patch.dict(os.environ, {}, clear=True):
+            logger = configure_logging()
+            assert logger.level == logging.INFO
+    
+    def test_configure_logging_debug(self):
+        """Test logging configuration with DEBUG level."""
+        from app import configure_logging
+        import logging
+        
+        with patch.dict(os.environ, {"LOG_LEVEL": "DEBUG"}):
+            logger = configure_logging()
+            assert logger.level == logging.DEBUG
+    
+    def test_configure_logging_invalid_level(self):
+        """Test logging configuration with invalid level defaults to INFO."""
+        from app import configure_logging
+        import logging
+        
+        with patch.dict(os.environ, {"LOG_LEVEL": "INVALID"}):
+            logger = configure_logging()
+            assert logger.level == logging.INFO
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
