@@ -1,0 +1,72 @@
+﻿2025-08-17T19:54:46.3449708Z ##[group]Run cd lambda
+2025-08-17T19:54:46.3449977Z [36;1mcd lambda[0m
+2025-08-17T19:54:46.3450146Z [36;1m[0m
+2025-08-17T19:54:46.3450326Z [36;1mecho "Starting SAM local API..."[0m
+2025-08-17T19:54:46.3450592Z [36;1msam local start-api --port 3000 &[0m
+2025-08-17T19:54:46.3450842Z [36;1mSAM_PID=$![0m
+2025-08-17T19:54:46.3451013Z [36;1m[0m
+2025-08-17T19:54:46.3451185Z [36;1m# Wait for the API to be ready[0m
+2025-08-17T19:54:46.3451464Z [36;1mecho "Waiting for local API to start..."[0m
+2025-08-17T19:54:46.3451731Z [36;1mfor i in {1..30}; do[0m
+2025-08-17T19:54:46.3452061Z [36;1m  if curl -s http://localhost:3000 > /dev/null 2>&1 || [ $? -eq 7 ]; then[0m
+2025-08-17T19:54:46.3452407Z [36;1m    echo "Local API is ready"[0m
+2025-08-17T19:54:46.3452639Z [36;1m    break[0m
+2025-08-17T19:54:46.3452810Z [36;1m  fi[0m
+2025-08-17T19:54:46.3453000Z [36;1m  echo "Waiting for API... ($i/30)"[0m
+2025-08-17T19:54:46.3453234Z [36;1m  sleep 2[0m
+2025-08-17T19:54:46.3453405Z [36;1mdone[0m
+2025-08-17T19:54:46.3453874Z [36;1m[0m
+2025-08-17T19:54:46.3454074Z [36;1m# Run integration tests against local API[0m
+2025-08-17T19:54:46.3454399Z [36;1mecho "Running integration tests against local API..."[0m
+2025-08-17T19:54:46.3455040Z [36;1mPYTHONPATH="app" TEST_API_KEY="$TEST_API_KEY" uv run pytest tests/integration/test_local_api.py -v --tb=short --junit-xml=test-results-integration.xml[0m
+2025-08-17T19:54:46.3455615Z [36;1m[0m
+2025-08-17T19:54:46.3455774Z [36;1m# Stop the local API[0m
+2025-08-17T19:54:46.3456000Z [36;1mecho "Stopping local API..."[0m
+2025-08-17T19:54:46.3456229Z [36;1mkill $SAM_PID || true[0m
+2025-08-17T19:54:46.3456454Z [36;1mwait $SAM_PID 2>/dev/null || true[0m
+2025-08-17T19:54:46.3496613Z shell: /usr/bin/bash -e {0}
+2025-08-17T19:54:46.3496835Z env:
+2025-08-17T19:54:46.3496991Z   PYTHONPATH: app
+2025-08-17T19:54:46.3497181Z   AWS_DEFAULT_REGION: us-east-1
+2025-08-17T19:54:46.3497425Z   TEST_API_KEY: test-api-key-12345
+2025-08-17T19:54:46.3497656Z   LOG_LEVEL: DEBUG
+2025-08-17T19:54:46.3497895Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-17T19:54:46.3498342Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-17T19:54:46.3498731Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-17T19:54:46.3499053Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-17T19:54:46.3499382Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-17T19:54:46.3499716Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-17T19:54:46.3499988Z ##[endgroup]
+2025-08-17T19:54:46.3557989Z Starting SAM local API...
+2025-08-17T19:54:46.3560111Z Waiting for local API to start...
+2025-08-17T19:54:46.3624077Z Local API is ready
+2025-08-17T19:54:46.3624530Z Running integration tests against local API...
+2025-08-17T19:54:46.5740113Z ============================= test session starts ==============================
+2025-08-17T19:54:46.5741191Z platform linux -- Python 3.11.13, pytest-8.4.1, pluggy-1.6.0 -- /home/runner/work/product-selector/product-selector/.venv/bin/python
+2025-08-17T19:54:46.5742122Z cachedir: .pytest_cache
+2025-08-17T19:54:46.5742640Z rootdir: /home/runner/work/product-selector/product-selector
+2025-08-17T19:54:46.5743239Z configfile: pyproject.toml
+2025-08-17T19:54:46.5743842Z plugins: anyio-4.10.0
+2025-08-17T19:54:46.9742562Z collecting ... collected 0 items / 1 error
+2025-08-17T19:54:46.9743439Z 
+2025-08-17T19:54:46.9743848Z ==================================== ERRORS ====================================
+2025-08-17T19:54:46.9744611Z _________ ERROR collecting lambda/tests/integration/test_local_api.py __________
+2025-08-17T19:54:46.9745930Z ImportError while importing test module '/home/runner/work/product-selector/product-selector/lambda/tests/integration/test_local_api.py'.
+2025-08-17T19:54:46.9747161Z Hint: make sure your test modules/packages have valid Python names.
+2025-08-17T19:54:46.9747686Z Traceback:
+2025-08-17T19:54:46.9748357Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/importlib/__init__.py:126: in import_module
+2025-08-17T19:54:46.9749695Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-17T19:54:46.9750295Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-17T19:54:46.9750812Z tests/integration/test_local_api.py:27: in <module>
+2025-08-17T19:54:46.9751477Z     from test_deployed_lambda import _resolve_region, _resolve_function_name
+2025-08-17T19:54:46.9752224Z E   ModuleNotFoundError: No module named 'test_deployed_lambda'
+2025-08-17T19:54:46.9753243Z - generated xml file: /home/runner/work/product-selector/product-selector/lambda/test-results-integration.xml -
+2025-08-17T19:54:46.9754426Z =========================== short test summary info ============================
+2025-08-17T19:54:46.9755005Z ERROR tests/integration/test_local_api.py
+2025-08-17T19:54:46.9755644Z !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+2025-08-17T19:54:46.9756242Z =============================== 1 error in 0.37s ===============================
+2025-08-17T19:54:47.2515040Z No current session found, using default AWS::AccountId
+2025-08-17T19:54:47.3090709Z Initializing the lambda functions containers.
+2025-08-17T19:54:47.5058765Z Local image was not found.
+2025-08-17T19:54:47.5060446Z Removing rapid images for repo public.ecr.aws/sam/emulation-python3.11
+2025-08-17T19:54:52.0180180Z ##[error]Process completed with exit code 2.

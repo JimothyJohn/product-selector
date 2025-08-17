@@ -24,7 +24,7 @@ import requests
 import boto3
 from botocore.exceptions import ClientError
 
-from test_deployed_lambda import _resolve_region, _resolve_function_name
+from .test_deployed_lambda import _resolve_region, _resolve_function_name
 
 
 def _is_local_api_running() -> bool:

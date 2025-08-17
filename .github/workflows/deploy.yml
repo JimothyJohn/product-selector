@@ -164,8 +164,8 @@ jobs:
     env:
       PYTHONPATH: "app"
       AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION || 'us-east-1' }}
-      STACK_NAME: ${{ vars.STACK_NAME || 'product-selector' }}
-      SAM_STACK_NAME: ${{ vars.STACK_NAME || 'product-selector' }}
+      STACK_NAME: ${{ vars.STACK_NAME || 'product-selector-dev' }}
+      SAM_STACK_NAME: ${{ vars.STACK_NAME || 'product-selector-dev' }}
     
     steps:
     - name: Checkout code
