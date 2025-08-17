@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 3: Basic Gearbox Filtering</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/steps.css">
+    <link rel="stylesheet" href="css/filters.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Gearbox Catalog API</h1>
+            <h2>Step 3: Basic Filtering</h2>
+            <p>Filter gearboxes by category and type</p>
+        </header>
+
+        <div class="step-info">
+            <h2>What This Step Does</h2>
+            <p>Now you can filter the gearbox data! Start with basic filters like category and type to narrow down your search. 
+            The filters are applied via URL query parameters to your API endpoint.</p>
+            <p><strong>Next:</strong> Step 4 will add advanced filtering with torque ratings, performance metrics, and more options.</p>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Basic Filters</h2>
+            
+            <div class="filter-examples">
+                <h4>💡 Try These Examples:</h4>
+                <p>• Filter by <strong>Category</strong>: automotive, industrial, marine</p>
+                <p>• Filter by <strong>Type</strong>: planetary, helical, worm, spur</p>
+                <p>• Use both together for more specific results</p>
+            </div>
+
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="categoryFilter">📂 Category:</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="industrial">Industrial</option>
+                        <option value="marine">Marine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeFilter">⚙️ Gearbox Type:</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="planetary">Planetary</option>
+                        <option value="helical">Helical</option>
+                        <option value="worm">Worm</option>
+                        <option value="spur">Spur</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn" onclick="applyFilters()">🔍 Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">🗑️ Clear Filters</button>
+                <button class="btn btn-secondary" onclick="showAllData()">📊 Show All Data</button>
+            </div>
+        </div>
+
+        <div id="activeFilters" class="active-filters" style="display: none;">
+            <strong>Active Filters:</strong>
+            <div id="filterTags"></div>
+        </div>
+
+        <div id="status" style="display: none;"></div>
+
+        <div id="results" class="card" style="display: none;">
+            <h2>📊 Filtered Results</h2>
+            
+            <div id="summary" class="summary"></div>
+            
+            <div id="categoriesSection" class="data-section">
+                <h3>📂 Categories</h3>
+                <div id="categoriesList"></div>
+            </div>
+
+            <div id="gearboxesSection" class="data-section">
+                <h3>⚙️ Gearboxes</h3>
+                <div id="gearboxesList"></div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="step2-querying.html" class="nav-btn back">
+                ⬅️ Back to Step 2: Data Querying
+            </a>
+            <a href="step4-advanced.html" class="nav-btn next">
+                ➡️ Continue to Step 4: Advanced Filtering
+            </a>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/display.js"></script>
+    <script src="js/step3.js"></script>
+</body>
+</html>

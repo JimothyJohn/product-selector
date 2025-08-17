@@ -1,0 +1,99 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    # AI-generated comment: Define environment variables for consistent behavior
+    # These mirror the local development environment setup
+    env:
+      PYTHONPATH: "app"
+      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION || 'us-east-1' }}
+    
+    steps:
+    # AI-generated comment: Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # AI-generated comment: Set up Python environment with the same version as SAM template
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    # AI-generated comment: Install uv package manager for fast Python dependency management
+    # This mirrors the local development setup from the Quickstart script
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    
+    # AI-generated comment: Install AWS SAM CLI for serverless application deployment
+    # Using the official GitHub Action for consistent and reliable installation
+    - name: Set up AWS SAM CLI
+      uses: aws-actions/setup-sam@v2
+      with:
+        use-installer: true
+    
+    # AI-generated comment: Configure AWS credentials using GitHub secrets
+    # These credentials are required for SAM deployment operations
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+    
+    # AI-generated comment: Change to lambda directory and execute deployment pipeline
+    # This step mirrors the exact commands from the Quickstart script
+    - name: Deploy to AWS
+      run: |
+        cd lambda
+        
+        # AI-generated comment: Format code using ruff for consistent style
+        echo "Formatting code..."
+        uv run ruff format app
+        
+        # AI-generated comment: Run unit tests to ensure code quality before deployment
+        echo "Running unit tests..."
+        PYTHONPATH="app" uv run pytest tests/unit
+        
+        # AI-generated comment: Validate SAM template for syntax and best practices
+        echo "Validating SAM template..."
+        sam validate --lint
+        
+        # AI-generated comment: Build the SAM application and prepare for deployment
+        echo "Building SAM application..."
+        sam build
+        
+        # AI-generated comment: Deploy to AWS using SAM configuration
+        echo "Deploying to AWS..."
+        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+    
+    # AI-generated comment: Upload test results for debugging if tests fail
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-results
+        path: |
+          lambda/tests/unit/test-results.xml
+          lambda/tests/integration/test-results.xml
+        retention-days: 7
+    
+    # AI-generated comment: Output deployment information for reference
+    - name: Display deployment info
+      if: success()
+      run: |
+        echo "Deployment completed successfully!"
+        echo "Check AWS Console for deployed resources."

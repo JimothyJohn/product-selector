@@ -29,7 +29,7 @@ def pytest_configure(config):
         "markers", "security: marks tests as security-focused tests"
     )
     config.addinivalue_line("markers", "performance: marks tests as performance tests")
-    config.addinivalue_line("markers", "lambda: marks tests for Lambda function")
+    config.addinivalue_line("markers", "aws_lambda: marks tests for Lambda function")
     config.addinivalue_line("markers", "api_gateway: marks tests for API Gateway integration")
 
 
@@ -109,9 +109,9 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.performance)
             item.add_marker(pytest.mark.slow)  # Performance tests are typically slow
 
-        # Add lambda marker for tests in lambda directory
+        # Add aws_lambda marker for tests in lambda directory
         if "/lambda/" in str(item.fspath):
-            item.add_marker(pytest.mark.lambda)
+            item.add_marker(pytest.mark.aws_lambda)
         
         # Add API Gateway marker for API Gateway tests
         if "api_gateway" in str(item.fspath) or "api_gateway" in item.name:

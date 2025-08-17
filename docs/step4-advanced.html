@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 4: Advanced Gearbox Filtering</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/steps.css">
+    <link rel="stylesheet" href="css/filters.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Gearbox Catalog API</h1>
+            <h2>Step 4: Advanced Filtering</h2>
+            <p>Complete filtering system with all available options</p>
+        </header>
+
+        <div class="step-info">
+            <h2>🎉 Final Step - Complete Filtering System</h2>
+            <p>This is the complete filtering interface with all available filter options including torque ratings, performance metrics, manufacturers, and price ranges. 
+            You can combine multiple filters for precise searches.</p>
+            <p><strong>Ready for production!</strong> This interface is now ready to be integrated into your application.</p>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Quick Preset Searches</h2>
+            <p>Try these common search scenarios:</p>
+            <div class="preset-filters">
+                <button class="preset-btn" onclick="applyPreset('high-performance')">🚀 High Performance (>90%)</button>
+                <button class="preset-btn" onclick="applyPreset('heavy-duty')">💪 Heavy Duty (>3000 Nm)</button>
+                <button class="preset-btn" onclick="applyPreset('automotive-planetary')">🚗 Automotive Planetary</button>
+                <button class="preset-btn" onclick="applyPreset('budget-friendly')">💰 Budget Friendly (Low Price)</button>
+                <button class="preset-btn" onclick="applyPreset('industrial-helical')">🏭 Industrial Helical</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Advanced Filters</h2>
+            
+            <div class="filter-examples">
+                <h4>💡 Filter Combinations:</h4>
+                <p>• <strong>Category + Type:</strong> Find specific gearbox types within applications</p>
+                <p>• <strong>Performance + Torque:</strong> High-performance gearboxes with specific power requirements</p>
+                <p>• <strong>Manufacturer + Price:</strong> Compare products from specific vendors within budget</p>
+                <p>• <strong>Application + Specs:</strong> Match exact requirements for your use case</p>
+            </div>
+
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="categoryFilter">📂 Category:</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="automotive">🚗 Automotive</option>
+                        <option value="industrial">🏭 Industrial</option>
+                        <option value="marine">🚢 Marine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeFilter">⚙️ Gearbox Type:</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="planetary">🪐 Planetary</option>
+                        <option value="helical">🌀 Helical</option>
+                        <option value="worm">🐛 Worm</option>
+                        <option value="spur">⚡ Spur</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="manufacturerFilter">🏢 Manufacturer:</label>
+                    <input type="text" id="manufacturerFilter" placeholder="e.g., GearTech Industries">
+                </div>
+
+                <div class="form-group">
+                    <label for="minTorqueFilter">💪 Min Torque (Nm):</label>
+                    <input type="number" id="minTorqueFilter" placeholder="e.g., 1000" min="0" step="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="minPerformanceFilter">⚡ Min Performance (%):</label>
+                    <input type="number" id="minPerformanceFilter" placeholder="e.g., 85" min="0" max="100" step="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="priceRangeFilter">💰 Price Range:</label>
+                    <select id="priceRangeFilter">
+                        <option value="">All Ranges</option>
+                        <option value="low">💚 Low</option>
+                        <option value="medium">💛 Medium</option>
+                        <option value="high">💙 High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <button class="btn" onclick="applyFilters()">🔍 Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">🗑️ Clear Filters</button>
+                <button class="btn btn-secondary" onclick="showAllData()">📊 Show All Data</button>
+                <button class="btn btn-success" onclick="exportResults()" id="exportBtn" style="display: none;">📁 Export Results</button>
+            </div>
+        </div>
+
+        <div id="activeFilters" class="active-filters" style="display: none;">
+            <strong>🎯 Active Filters:</strong>
+            <div id="filterTags"></div>
+        </div>
+
+        <div id="status" style="display: none;"></div>
+
+        <div id="results" class="card" style="display: none;">
+            <h2 id="resultsTitle">📊 Search Results</h2>
+            
+            <div id="summary" class="summary"></div>
+            
+            <div id="categoriesSection" class="data-section">
+                <h3>📂 Categories</h3>
+                <div id="categoriesList"></div>
+            </div>
+
+            <div id="gearboxesSection" class="data-section">
+                <h3>⚙️ Gearboxes</h3>
+                <div id="gearboxesList"></div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="step3-filtering.html" class="nav-btn back">
+                ⬅️ Back to Step 3: Basic Filtering
+            </a>
+            <a href="index.html" class="nav-btn complete">
+                ✅ Go to Complete Interface
+            </a>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/display.js"></script>
+    <script src="js/step4.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2: Gearbox API Data Querying</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/steps.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Gearbox Catalog API</h1>
+            <h2>Step 2: Data Querying</h2>
+            <p>Fetch and display all data from your API</p>
+        </header>
+
+        <div class="step-info">
+            <h2>What This Step Does</h2>
+            <p>Now that your connection is working, let's fetch and display all the gearbox catalog data. 
+            You'll see the complete dataset organized into categories and gearboxes with all their specifications.</p>
+            <p><strong>Next:</strong> In Step 3, you'll add basic filtering capabilities to narrow down the results.</p>
+        </div>
+
+        <div class="card">
+            <h2>📡 Current Configuration</h2>
+            <div id="configDisplay" class="config-display">
+                <p><strong>API Endpoint:</strong> <code id="currentEndpoint">Not configured</code></p>
+                <p><strong>API Key:</strong> <code id="currentApiKey">Not set</code></p>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="fetchAllData()">📊 Fetch All Data</button>
+                <button class="btn btn-secondary" onclick="clearData()">🗑️ Clear Results</button>
+            </div>
+        </div>
+
+        <div id="status" style="display: none;"></div>
+
+        <div id="results" class="card" style="display: none;">
+            <h2>📊 Catalog Data</h2>
+            
+            <div id="summary" class="summary"></div>
+            
+            <div id="categoriesSection" class="data-section">
+                <h3>📂 Categories</h3>
+                <div id="categoriesList"></div>
+            </div>
+
+            <div id="gearboxesSection" class="data-section">
+                <h3>⚙️ Gearboxes</h3>
+                <div id="gearboxesList"></div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="step1-connection.html" class="nav-btn back">
+                ⬅️ Back to Step 1: Connection Test
+            </a>
+            <a href="step3-filtering.html" class="nav-btn next" id="nextStep" style="display: none;">
+                ➡️ Continue to Step 3: Basic Filtering
+            </a>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/display.js"></script>
+    <script src="js/step2.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: Gearbox API Connection Test</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/steps.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Gearbox Catalog API</h1>
+            <h2>Step 1: Connection Test</h2>
+            <p>Test your API endpoint and authentication</p>
+        </header>
+
+        <div class="step-info">
+            <h2>What This Step Does</h2>
+            <p>This step helps you configure and test the connection to your Gearbox Catalog API. 
+            You'll need your API Gateway endpoint URL and optionally an API key if your endpoint requires authentication.</p>
+            <p><strong>Next:</strong> Once connected successfully, you can proceed to query and display data.</p>
+        </div>
+
+        <div class="card">
+            <h2>📡 API Configuration</h2>
+            <div class="form-group">
+                <label for="apiEndpoint">API Endpoint URL:</label>
+                <input type="url" id="apiEndpoint" 
+                       placeholder="https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/Prod/gearboxes"
+                       value="">
+            </div>
+            <div class="form-group">
+                <label for="apiKey">API Key (optional):</label>
+                <input type="text" id="apiKey" placeholder="your-api-key-here">
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="testConnection()">🔗 Test Connection</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Current Configuration</h2>
+            <div class="config-display">
+                <p><strong>API Endpoint:</strong> <code id="currentEndpoint">Not configured</code></p>
+                <p><strong>API Key:</strong> <code id="currentApiKey">Not set</code></p>
+            </div>
+        </div>
+
+        <div id="status" style="display: none;"></div>
+
+        <div class="navigation">
+            <a href="step2-querying.html" class="nav-btn" id="nextStep" style="display: none;">
+                ➡️ Continue to Step 2: Data Querying
+            </a>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/step1.js"></script>
+</body>
+</html>

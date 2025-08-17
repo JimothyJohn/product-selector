@@ -97,9 +97,7 @@ main() {
         PYTHONPATH="app" uv run pytest tests/unit && \
         sam validate --lint && \
         sam build && \
-        sam deploy && \
-        PYTHONPATH="app" uv run pytest tests/integration && \ 
-        cd -
+        sam deploy
 }
 
 main "$@"

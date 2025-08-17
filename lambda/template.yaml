@@ -35,12 +35,38 @@ Resources:
       FunctionUrlConfig:
         AuthType: AWS_IAM
         InvokeMode: RESPONSE_STREAM
-      # Enable access to API keys
+      # Enable access to DynamoDB and API Gateway
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Scan
+                - dynamodb:Query
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+              Resource: 
+                - arn:aws:dynamodb:*:*:table/gearbox_catalog
+                - arn:aws:dynamodb:*:*:table/gearbox_catalog/index/*
       Events:
-        ProductSelectorGet:
+        GearboxCatalogGet:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /gearboxes
+            Method: GET
+            RestApiId: !Ref ApiGateway
+        GearboxCatalogPost:
+          Type: Api
+          Properties:
+            Path: /gearboxes
+            Method: POST
+            RestApiId: !Ref ApiGateway
+        # Backward compatibility with original hello endpoint
+        ProductSelectorGet:
+          Type: Api
           Properties:
             Path: /hello
             Method: GET
@@ -83,12 +109,15 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GearboxCatalogApi:
+    Description: API Gateway endpoint URL for Prod stage for Gearbox Catalog function
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/gearboxes"
   ProductSelectorApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Description: API Gateway endpoint URL for Prod stage for Hello World function (backward compatibility)
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
   ProductSelectorFunction:
-    Description: Hello World Lambda Function ARN
+    Description: Gearbox Catalog Lambda Function ARN
     Value: !GetAtt ProductSelectorFunction.Arn
   ProductSelectorFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+    Description: Implicit IAM Role created for Gearbox Catalog function
     Value: !GetAtt ProductSelectorFunctionRole.Arn

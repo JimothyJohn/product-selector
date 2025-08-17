@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gearbox Catalog - Browse & Filter</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/filters.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Gearbox Catalog</h1>
+            <p>Browse and filter industrial gearboxes with advanced search capabilities</p>
+        </header>
+
+        <section class="step-links">
+            <h2>🚀 Getting Started - Step by Step</h2>
+            <p style="margin-bottom: 1rem;">New to this interface? Follow these steps to test your API and learn the features:</p>
+            <div class="step-grid">
+                <a href="step1-connection.html" class="step-link">
+                    <div class="step-number">1</div>
+                    <strong>Test Connection</strong>
+                    <small>Verify your API is working</small>
+                </a>
+                <a href="step2-querying.html" class="step-link">
+                    <div class="step-number">2</div>
+                    <strong>Query Data</strong>
+                    <small>Fetch and display all data</small>
+                </a>
+                <a href="step3-filtering.html" class="step-link">
+                    <div class="step-number">3</div>
+                    <strong>Basic Filtering</strong>
+                    <small>Filter by category and type</small>
+                </a>
+                <a href="step4-advanced.html" class="step-link">
+                    <div class="step-number">4</div>
+                    <strong>Advanced Filtering</strong>
+                    <small>All filters with presets</small>
+                </a>
+            </div>
+        </section>
+
+        <section class="config-section">
+            <h2>🔗 API Configuration</h2>
+            <div class="form-group">
+                <label for="apiEndpoint">API Endpoint URL:</label>
+                <input type="url" id="apiEndpoint" 
+                       placeholder="https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/Prod/gearboxes"
+                       value="">
+            </div>
+            <div class="form-group">
+                <label for="apiKey">API Key (optional):</label>
+                <input type="text" id="apiKey" placeholder="your-api-key-here">
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <h2>🔍 Filter Options</h2>
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="categoryFilter">Category:</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="industrial">Industrial</option>
+                        <option value="marine">Marine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeFilter">Gearbox Type:</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="planetary">Planetary</option>
+                        <option value="helical">Helical</option>
+                        <option value="worm">Worm</option>
+                        <option value="spur">Spur</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="manufacturerFilter">Manufacturer:</label>
+                    <input type="text" id="manufacturerFilter" placeholder="e.g., GearTech Industries">
+                </div>
+
+                <div class="form-group">
+                    <label for="minTorqueFilter">Min Torque (Nm):</label>
+                    <input type="number" id="minTorqueFilter" placeholder="e.g., 1000" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="minPerformanceFilter">Min Performance (%):</label>
+                    <input type="number" id="minPerformanceFilter" placeholder="e.g., 85" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="priceRangeFilter">Price Range:</label>
+                    <select id="priceRangeFilter">
+                        <option value="">All Ranges</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn" onclick="searchGearboxes()">🔍 Search Gearboxes</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">🗑️ Clear Filters</button>
+            </div>
+        </section>
+
+        <div id="activeFilters" class="active-filters" style="display: none;">
+            <strong>Active Filters:</strong>
+            <div id="filterTags"></div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            🔄 Loading gearbox data...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <section id="results" class="results-section" style="display: none;">
+            <div class="results-header">
+                <h2 id="resultsTitle">📊 Search Results</h2>
+            </div>
+            <div class="results-content">
+                <div id="summary" class="summary"></div>
+                
+                <div id="categoriesSection" class="category-section">
+                    <h3>📂 Categories</h3>
+                    <div id="categoriesList"></div>
+                </div>
+
+                <div id="gearboxesSection" class="gearbox-section">
+                    <h3>⚙️ Gearboxes</h3>
+                    <div id="gearboxesList"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/display.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

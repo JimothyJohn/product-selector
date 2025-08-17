@@ -1,0 +1,34 @@
+/* Step-specific styles */
+.step-info {
+    background: #e8f4fd;
+    border: 1px solid #bee5eb;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.step-info h2 {
+    color: #0c5460;
+    margin-bottom: 1rem;
+}
+
+.config-display {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+.config-display code {
+    background: rgba(0,0,0,0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 768px) {
+    .data-specs {
+        grid-template-columns: 1fr;
+    }
+}

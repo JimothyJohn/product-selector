@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gearbox Catalog - Browse & Filter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .config-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-section h2 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-header {
+            background: #667eea;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .results-content {
+            padding: 1.5rem;
+        }
+
+        .summary {
+            background: #e8f2ff;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .category-section, .gearbox-section {
+            margin-bottom: 2rem;
+        }
+
+        .category-section h3, .gearbox-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .category-item, .gearbox-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .gearbox-item h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .gearbox-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 3px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        .active-filters {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid #bee5eb;
+        }
+
+        .filter-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Gearbox Catalog</h1>
+            <p>Browse and filter industrial gearboxes with advanced search capabilities</p>
+        </header>
+
+        <section class="config-section">
+            <h2>🔗 API Configuration</h2>
+            <div class="form-group">
+                <label for="apiEndpoint">API Endpoint URL:</label>
+                <input type="url" id="apiEndpoint" 
+                       placeholder="https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/Prod/gearboxes"
+                       value="">
+            </div>
+            <div class="form-group">
+                <label for="apiKey">API Key (optional):</label>
+                <input type="text" id="apiKey" placeholder="your-api-key-here">
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <h2>🔍 Filter Options</h2>
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="categoryFilter">Category:</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="industrial">Industrial</option>
+                        <option value="marine">Marine</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeFilter">Gearbox Type:</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="planetary">Planetary</option>
+                        <option value="helical">Helical</option>
+                        <option value="worm">Worm</option>
+                        <option value="spur">Spur</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="manufacturerFilter">Manufacturer:</label>
+                    <input type="text" id="manufacturerFilter" placeholder="e.g., GearTech Industries">
+                </div>
+
+                <div class="form-group">
+                    <label for="minTorqueFilter">Min Torque (Nm):</label>
+                    <input type="number" id="minTorqueFilter" placeholder="e.g., 1000" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="minPerformanceFilter">Min Performance (%):</label>
+                    <input type="number" id="minPerformanceFilter" placeholder="e.g., 85" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="priceRangeFilter">Price Range:</label>
+                    <select id="priceRangeFilter">
+                        <option value="">All Ranges</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn" onclick="searchGearboxes()">🔍 Search Gearboxes</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">🗑️ Clear Filters</button>
+            </div>
+        </section>
+
+        <div id="activeFilters" class="active-filters" style="display: none;">
+            <strong>Active Filters:</strong>
+            <div id="filterTags"></div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            🔄 Loading gearbox data...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <section id="results" class="results-section" style="display: none;">
+            <div class="results-header">
+                <h2 id="resultsTitle">📊 Search Results</h2>
+            </div>
+            <div class="results-content">
+                <div id="summary" class="summary"></div>
+                
+                <div id="categoriesSection" class="category-section">
+                    <h3>📂 Categories</h3>
+                    <div id="categoriesList"></div>
+                </div>
+
+                <div id="gearboxesSection" class="gearbox-section">
+                    <h3>⚙️ Gearboxes</h3>
+                    <div id="gearboxesList"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Global variables
+        let currentData = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load initial data
+            searchGearboxes();
+        });
+
+        // Build query parameters from filters
+        function buildQueryParams() {
+            const params = new URLSearchParams();
+            
+            const category = document.getElementById('categoryFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const manufacturer = document.getElementById('manufacturerFilter').value;
+            const minTorque = document.getElementById('minTorqueFilter').value;
+            const minPerformance = document.getElementById('minPerformanceFilter').value;
+            const priceRange = document.getElementById('priceRangeFilter').value;
+
+            if (category) params.append('category', category);
+            if (type) params.append('type', type);
+            if (manufacturer) params.append('manufacturer', manufacturer);
+            if (minTorque) params.append('min_torque', minTorque);
+            if (minPerformance) params.append('min_performance', minPerformance);
+            if (priceRange) params.append('price_range', priceRange);
+
+            return params;
+        }
+
+        // Update active filters display
+        function updateActiveFilters() {
+            const params = buildQueryParams();
+            const activeFiltersDiv = document.getElementById('activeFilters');
+            const filterTagsDiv = document.getElementById('filterTags');
+
+            if (params.toString()) {
+                const tags = [];
+                for (const [key, value] of params) {
+                    tags.push(`<span class="filter-tag">${key}: ${value}</span>`);
+                }
+                filterTagsDiv.innerHTML = tags.join('');
+                activeFiltersDiv.style.display = 'block';
+            } else {
+                activeFiltersDiv.style.display = 'none';
+            }
+        }
+
+        // Search for gearboxes
+        async function searchGearboxes() {
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            const apiKey = document.getElementById('apiKey').value;
+
+            // Validate API endpoint
+            if (!apiEndpoint) {
+                showError('Please enter an API endpoint URL');
+                return;
+            }
+
+            // Show loading state
+            showLoading(true);
+            hideError();
+            hideResults();
+
+            try {
+                // Build URL with query parameters
+                const params = buildQueryParams();
+                const url = params.toString() ? `${apiEndpoint}?${params}` : apiEndpoint;
+
+                // Prepare headers
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (apiKey) {
+                    headers['x-api-key'] = apiKey;
+                }
+
+                // Make API call
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                currentData = data;
+
+                // Update UI
+                updateActiveFilters();
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError(`Failed to fetch data: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Display search results
+        function displayResults(data) {
+            const resultsSection = document.getElementById('results');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const summaryDiv = document.getElementById('summary');
+            const categoriesList = document.getElementById('categoriesList');
+            const gearboxesList = document.getElementById('gearboxesList');
+            const categoriesSection = document.getElementById('categoriesSection');
+            const gearboxesSection = document.getElementById('gearboxesSection');
+
+            // Update title and summary
+            resultsTitle.textContent = data.message || 'Search Results';
+            
+            const summary = data.summary || {};
+            summaryDiv.innerHTML = `
+                <strong>Results Summary:</strong>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+                    <div>📊 Total Items: <strong>${summary.total_items || 0}</strong></div>
+                    <div>📂 Categories: <strong>${summary.categories || 0}</strong></div>
+                    <div>⚙️ Gearboxes: <strong>${summary.gearbox_products || 0}</strong></div>
+                </div>
+            `;
+
+            // Display categories
+            const categories = data.categories || [];
+            if (categories.length > 0) {
+                categoriesList.innerHTML = categories.map(category => `
+                    <div class="category-item">
+                        <h4>${category.category_name || 'Unknown Category'}</h4>
+                        <p>${category.description || 'No description available'}</p>
+                    </div>
+                `).join('');
+                categoriesSection.style.display = 'block';
+            } else {
+                categoriesSection.style.display = 'none';
+            }
+
+            // Display gearboxes
+            const gearboxes = data.gearboxes || [];
+            if (gearboxes.length > 0) {
+                gearboxesList.innerHTML = gearboxes.map(gearbox => `
+                    <div class="gearbox-item">
+                        <h4>${gearbox.model_name || 'Unknown Model'}</h4>
+                        <p><strong>Manufacturer:</strong> ${gearbox.manufacturer || 'Unknown'}</p>
+                        <div class="gearbox-specs">
+                            <div class="spec-item"><strong>Type:</strong> ${gearbox.gearbox_type || 'N/A'}</div>
+                            <div class="spec-item"><strong>Torque:</strong> ${gearbox.torque_rating || 'N/A'} Nm</div>
+                            <div class="spec-item"><strong>Performance:</strong> ${gearbox.performance_rating || 'N/A'}%</div>
+                            <div class="spec-item"><strong>Application:</strong> ${gearbox.application_type || 'N/A'}</div>
+                            <div class="spec-item"><strong>Price Range:</strong> ${gearbox.price_range || 'N/A'}</div>
+                            <div class="spec-item"><strong>ID:</strong> ${gearbox.gearbox_id || 'N/A'}</div>
+                        </div>
+                    </div>
+                `).join('');
+                gearboxesSection.style.display = 'block';
+            } else {
+                gearboxesList.innerHTML = '<div class="no-results">No gearboxes found matching your criteria.</div>';
+                gearboxesSection.style.display = 'block';
+            }
+
+            // Show no results message if nothing found
+            if (categories.length === 0 && gearboxes.length === 0) {
+                summaryDiv.innerHTML += '<div class="no-results">No results found. Try adjusting your filters.</div>';
+            }
+
+            resultsSection.style.display = 'block';
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('manufacturerFilter').value = '';
+            document.getElementById('minTorqueFilter').value = '';
+            document.getElementById('minPerformanceFilter').value = '';
+            document.getElementById('priceRangeFilter').value = '';
+            
+            updateActiveFilters();
+            searchGearboxes();
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function hideResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+
+        // Add enter key support for search
+        document.querySelectorAll('#manufacturerFilter, #minTorqueFilter, #minPerformanceFilter').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchGearboxes();
+                }
+            });
+        });
+
+        // Add change listeners for dropdowns
+        document.querySelectorAll('#categoryFilter, #typeFilter, #priceRangeFilter').forEach(select => {
+            select.addEventListener('change', function() {
+                updateActiveFilters();
+            });
+        });
+    </script>
+</body>
+</html>
